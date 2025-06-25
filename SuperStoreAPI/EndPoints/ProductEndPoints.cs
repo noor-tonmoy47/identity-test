@@ -8,13 +8,13 @@ public static class ProductEndPoints
 {
     public static void MapEndPoints(this IEndpointRouteBuilder app)
     {
-        var productGroup = app.MapGroup("api/v1/products").RequireAuthorization();
+        var productGroup = app.MapGroup("api/v1/products");
         
-        productGroup.MapGet("", Get).WithName("Get");
-        productGroup.MapPost("", Post).WithName("Post");
-        productGroup.MapGet("{id}", GetById).WithName("GetById");
-        productGroup.MapPut("{id}", Put).WithName("Put");
-        productGroup.MapDelete("{id}", Delete).WithName("Delete");
+        productGroup.MapGet("", Get).WithName("GetProducts");
+        productGroup.MapPost("", Post).WithName("PostProduct");
+        productGroup.MapGet("{id}", GetById).WithName("GetProductById");
+        productGroup.MapPut("{id}", Put).WithName("PutProduct");
+        productGroup.MapDelete("{id}", Delete).WithName("DeleteProduct");
     }
 
     private static async Task<IResult> Get(IProductService productService)

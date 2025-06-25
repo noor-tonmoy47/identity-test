@@ -8,13 +8,13 @@ public static class UserEndPoints
 {
     public static void MapUserEndpoints(this IEndpointRouteBuilder app)
     {
-        var userGroup = app.MapGroup("api/v1/users").RequireAuthorization();
+        var userGroup = app.MapGroup("api/v1/users");
         
-        userGroup.MapGet("", Get).WithName("Get");
-        userGroup.MapPost("", Post).WithName("Post");
-        userGroup.MapGet("{id}", GetById).WithName("GetById");
-        userGroup.MapPut("{id}", Put).WithName("Put");
-        userGroup.MapDelete("{id}", Delete).WithName("Delete");
+        userGroup.MapGet("", Get).WithName("GetUsers");
+        userGroup.MapPost("", Post).WithName("PostUser");
+        userGroup.MapGet("{id}", GetById).WithName("GetUserById");
+        userGroup.MapPut("{id}", Put).WithName("PutUser");
+        userGroup.MapDelete("{id}", Delete).WithName("DeleteUser");
         
     }
     

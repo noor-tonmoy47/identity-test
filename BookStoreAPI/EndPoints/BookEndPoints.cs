@@ -9,7 +9,7 @@ public static class BookEndPoints
     
     public static void MapEndPoints(this IEndpointRouteBuilder app)
     {
-        var bookGroup = app.MapGroup("api/v1/books").RequireAuthorization();
+        var bookGroup = app.MapGroup("/api/v1/books");
         
         bookGroup.MapGet("", Get).WithName("Get");
         bookGroup.MapPost("", Post).WithName("Post");
