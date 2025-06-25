@@ -1,17 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SuperStoreAPI.Models;
+using SuperStoreAPI.Services.UserService;
 
 namespace SuperStoreAPI.EndPoints;
 
 public static class UserEndPoints
 {
-    private static List<User> Users = 
-    [
-        new(){Id = 1, Name = "David", Email = "david@gmail.com"},
-        new(){Id = 2, Name = "Fred", Email = "fred@gmail.com"},
-        new(){Id = 3, Name = "John", Email = "john@gmail.com"}
-    ];
-
     public static void MapUserEndpoints(this IEndpointRouteBuilder app)
     {
         var userGroup = app.MapGroup("api/v1/users").RequireAuthorization();
@@ -24,40 +18,36 @@ public static class UserEndPoints
         
     }
     
-    private static async Task<IResult> Get() => Results.Ok(Users);
-
-    private static async Task<IResult> Post([FromBody] User? pr)
+    private static async Task<IResult> Get(IUserService userService)
     {
-        if (pr is null)
-            return Results.BadRequest();
-        pr.Id = Users.Max(x => x.Id) + 1;
-        Users.Add(pr);
-        return Results.CreatedAtRoute("GetById", new { id = pr.Id }, pr);
+        var listOfUsers = await userService.GetProductsAsync();
+        return Results.Ok(listOfUsers);
     }
 
-    private static async Task<IResult> GetById([FromRoute] int id)
+    private static async Task<IResult> Post(IUserService userService, [FromBody] User? pr)
     {
-        var user = Users.FirstOrDefault(x => x.Id == id);
+        var createdUser = await userService.CreateProductAsync(pr);
+        if (createdUser is null)
+            return Results.BadRequest();
+       
+        return Results.CreatedAtRoute("GetById", new { id = pr.Id }, createdUser);
+    }
+
+    private static async Task<IResult> GetById(IUserService userService, [FromRoute] int id)
+    {
+        var user = await userService.GetProductByIdAsync(id);
         return user == null ? Results.NotFound("User Not Found") : Results.Ok(user);
     }
 
-    private static async Task<IResult> Put([FromBody] User? usr)
+    private static async Task<IResult> Put(IUserService userService, [FromBody] User? usr)
     {
-        if (usr is null)
-            return Results.BadRequest("Request body is required");
-        
-        var user = Users.FirstOrDefault(x => x.Id == usr.Id);
-        if (user is null)
-            return Results.NotFound("User not found");
-        user.Name = usr.Name;
-        user.Email = usr.Email;
-        
-        return Results.Ok(user);
+        var updatedUser = await userService.UpdateProductAsync(usr);
+        return updatedUser is null ? Results.BadRequest() : Results.Ok(updatedUser);
     }
 
-    private static async Task<IResult> Delete([FromRoute] int id)
+    private static async Task<IResult> Delete(IUserService userService, [FromRoute] int id)
     {
-        var removeCount = Users.RemoveAll(p => p.Id == id);
-        return removeCount > 0 ? Results.NoContent() : Results.NotFound();
+        var isDeleted = await userService.DeleteProductAsync(id);
+        return isDeleted ? Results.NoContent() : Results.NotFound();
     }
 }
